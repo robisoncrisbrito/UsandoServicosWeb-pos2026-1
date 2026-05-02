@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import br.edu.utfpr.usandoservicosweb.api.RetrofitClient
 import org.ksoap2.SoapEnvelope
 import org.ksoap2.serialization.SoapObject
 import org.ksoap2.serialization.SoapSerializationEnvelope
@@ -43,24 +44,10 @@ class MainActivity : AppCompatActivity() {
 
             try {
 
-                val request = SoapObject(NAMESPACE, METHOD_NAME).apply {
-                    addProperty("ubiNum", etNumero.text.toString())
-                }
-
-                val envelope = SoapSerializationEnvelope(SoapEnvelope.VER11).apply {
-                    dotNet = true
-                    setOutputSoapObject(request)
-                }
-
-                val transport = HttpTransportSE(URL, 30000)
-                transport.debug = true
-
-                transport.call( SOAP_ACTION, envelope)
-
-                val retorno = envelope.response.toString()
+                val resposta = RetrofitClient.viaCepService.buscarCep(etNumero.text.toString()).execute()
 
                 runOnUiThread {
-                    tvResultado.text = retorno
+                    tvResultado.text = resposta.body()?.logradouro
                 }
 
             } catch (e: Exception) {
